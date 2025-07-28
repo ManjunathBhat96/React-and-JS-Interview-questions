@@ -85,3 +85,32 @@ Here:
 inner() is a closure
 
 It retains access to count even after outer() has finished executing
+
+### 3. How does JavaScript’s event loop work?
+🧠 In Simple Terms:
+JavaScript has one main thread that runs your code.
+But it can do things asynchronously (without blocking).
+How? That’s where the event loop comes in!
+
+🏗️ Key Components:
+Call Stack 📚
+Where function calls are executed one at a time.
+
+Web APIs / Background Tasks 🌐
+Browser-provided APIs like setTimeout, fetch, DOM events, etc.
+
+Callback / Task Queues 📥
+
+Callback Queue (Macrotasks): e.g., setTimeout, DOM events
+
+Microtask Queue: e.g., Promise.then, async/await
+(runs before the callback queue!)
+
+Event Loop 🔁
+A loop that keeps checking:
+
+Is the call stack empty?
+
+If yes, it moves tasks from queues into the stack.
+
+### 4. What are promises, async/await? Explain with examples.

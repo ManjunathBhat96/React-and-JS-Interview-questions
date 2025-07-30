@@ -113,4 +113,113 @@ Is the call stack empty?
 
 If yes, it moves tasks from queues into the stack.
 
-### 4. What are promises, async/await? Explain with examples.
+### 4. What are promises Explain with examples.
+JavaScript runs in a single thread. If you do something that takes time (like fetching data from a server), it would block everything unless you do it asynchronously.
+
+Promises let you:
+
+Wait for things (like data) to finish
+Handle success or failure in a cleaner way
+Chain multiple steps without writing deeply nested callbacks (a.k.a. “callback hell”)
+
+Example
+console.log("1");
+
+setTimeout(() => {
+  console.log("2 (Macrotask)");
+}, 0);
+
+Promise.resolve().then(() => {
+  console.log("3 (Microtask)");
+});
+
+console.log("4");
+Output:
+1
+4
+3 (Microtask)
+2 (Macrotask)
+
+✅ 1. Promise.all – Wait for all to succeed
+
+const getProfile = () => Promise.resolve("👤 User Profile");
+const getOrders = () => Promise.resolve("🛒 Orders");
+const getNotifications = () => Promise.resolve("🔔 Notifications");
+
+Promise.all([getProfile(), getOrders(), getNotifications()])
+  .then(([profile, orders, notifications]) => {
+    console.log("All data loaded:");
+    console.log(profile);       // 👤 User Profile
+    console.log(orders);        // 🛒 Orders
+    console.log(notifications); // 🔔 Notifications
+  })
+  .catch((err) => {
+    console.error("Failed to load data:", err);
+  });
+
+  #using fetch 
+  Promise.all([
+  fetch("https://jsonplaceholder.typicode.com/users/1"),         // User
+  fetch("https://jsonplaceholder.typicode.com/posts?userId=1"),  // Posts
+  fetch("https://jsonplaceholder.typicode.com/todos?userId=1")   // Todos
+])
+  .then(async ([userRes, postsRes, todosRes]) => {
+    const user = await userRes.json();
+    const posts = await postsRes.json();
+    const todos = await todosRes.json();
+
+    console.log("👤 User:", user.name);
+    console.log("📝 Posts count:", posts.length);
+    console.log("✅ Todos count:", todos.length);
+  })
+  .catch((err) => {
+    console.error("🚫 One or more requests failed:", err);
+  });
+🔥 If any one of the promises fails, the whole .catch() is triggered.
+
+🔐 2. Promise.allSettled – Wait for all to finish, regardless of success or failure
+
+const getProfile = () => Promise.resolve("✅ Profile loaded");
+const getOrders = () => Promise.reject("❌ Orders API failed");
+const getNotifications = () => Promise.resolve("✅ Notifications loaded");
+
+Promise.allSettled([getProfile(), getOrders(), getNotifications()])
+  .then((results) => {
+    results.forEach((result, i) => {
+      console.log(`Result ${i + 1}:`, result.status, result.value || result.reason);
+    });
+  });
+👍 Use this when you want results from all, even if some failed.
+
+🏁 3. Promise.race – Takes the first one to finish
+
+const slow = () => new Promise(res => setTimeout(() => res("Slow"), 2000));
+const fast = () => new Promise(res => setTimeout(() => res("Fast"), 500));
+
+Promise.race([slow(), fast()])
+  .then((result) => {
+    console.log("Winner:", result); // Fast
+  });
+🏎 Use when first response wins, like timeout fallback logic.
+
+🟢 4. Promise.any – Takes the first successful promise
+
+const p1 = Promise.reject("❌ First failed");
+const p2 = Promise.reject("❌ Second failed");
+const p3 = Promise.resolve("✅ Third succeeded");
+
+Promise.any([p1, p2, p3])
+  .then((result) => {
+    console.log("First successful:", result); // ✅ Third succeeded
+  })
+  .catch((err) => {
+    console.error("All failed");
+  });
+✅ Useful when only one success is needed.
+
+🧠 Summary Table
+Method	Waits for All	Fails Fast	Returns All Results	Use When…
+Promise.all	✅	✅	❌	All must succeed
+Promise.allSettled	✅	❌	✅	You want all results regardless
+Promise.race	❌	❌	❌	First to finish matters
+Promise.any	❌	❌	❌	Only one success needed

@@ -223,3 +223,90 @@ Promise.all	✅	✅	❌	All must succeed
 Promise.allSettled	✅	❌	✅	You want all results regardless
 Promise.race	❌	❌	❌	First to finish matters
 Promise.any	❌	❌	❌	Only one success needed
+
+### 5. What is debouncing vs throttling?
+
+👉 Debounce delays the function execution until after the user has stopped triggering the event for a certain time.
+
+
+function debounce(fn, delay) {
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+
+// Usage
+const searchHandler = debounce(() => {
+  console.log("API call made after user stops typing");
+}, 500);
+
+input.addEventListener("input", searchHandler);
+📍 Used for: search boxes, resize events, form validation.
+
+🕒 Throttling Explained
+👉 Throttle ensures the function executes at most once every X milliseconds, even if triggered multiple times.
+
+
+function throttle(fn, limit) {
+  let lastCall = 0;
+  return function (...args) {
+    const now = Date.now();
+    if (now - lastCall >= limit) {
+      lastCall = now;
+      fn.apply(this, args);
+    }
+  };
+}
+
+// Usage
+const scrollHandler = throttle(() => {
+  console.log("Scroll position checked every 200ms");
+}, 200);
+
+window.addEventListener("scroll", scrollHandler);
+📍 Used for: scroll events, window resizing, button mashing prevention.
+✅ Debouncing vs Throttling — Quick Summary
+Feature	Debounce	Throttle
+Definition	Executes after a pause	Executes at regular intervals
+Trigger Style	Waits until event stops	Executes every X ms, no matter how often
+Use Case	Auto-suggest, search input, resize events	Scroll position updates, API polling
+Real Analogy	Wait until user stops typing to send API	Allow 1 tweet per minute max
+
+### 6. Explain shallow copy vs deep copy
+
+Type	What It Does
+Shallow Copy	Copies only the first level; nested objects/arrays are still linked
+Deep Copy	Copies everything recursively; nested objects/arrays are completely independent
+
+📦 Example: Shallow Copy
+
+const original = {
+  name: "Manjunath",
+  address: { city: "Bengaluru" }
+};
+
+const shallowCopy = { ...original };
+
+shallowCopy.name = "Ajay";           // ✅ changes only the copy
+shallowCopy.address.city = "Mysuru"; // ❗ changes both copy and original
+
+console.log(original.address.city);  // ❗ "Mysuru" — unexpected mutation
+💡 ...spread, Object.assign(), Array.slice() → all create shallow copies.
+
+📦 Example: Deep Copy
+
+const original = {
+  name: "Manjunath",
+  address: { city: "Bengaluru" }
+};
+
+// Deep Copy using structuredClone (best modern method)
+const deepCopy = structuredClone(original);
+
+deepCopy.address.city = "Mysuru";
+
+console.log(original.address.city); // ✅ "Bengaluru" — safe!
+✅ The nested object is fully independent now.
+

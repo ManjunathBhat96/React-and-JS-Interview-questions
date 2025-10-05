@@ -310,3 +310,125 @@ deepCopy.address.city = "Mysuru";
 console.log(original.address.city); // ✅ "Bengaluru" — safe!
 ✅ The nested object is fully independent now.
 
+
+### 7. Explain ployfill and implement it for mpa and filter
+A polyfill is a custom implementation of a native JavaScript feature — used when that feature doesn’t exist in older browsers or to show understanding of how it works internally.
+
+1️⃣ Polyfill for Array.prototype.map()
+
+👉 map() takes a callback and returns a new array with results of calling that callback on each element.
+
+✅ Native Example
+const arr = [1, 2, 3];
+const doubled = arr.map(num => num * 2);
+console.log(doubled); // [2, 4, 6]
+
+🧩 Polyfill Implementation
+Array.prototype.myMap = function(callback, thisArg) {
+  if (typeof callback !== "function") {
+    throw new TypeError(callback + " is not a function");
+  }
+
+  const result = [];
+  for (let i = 0; i < this.length; i++) {
+    // skip empty slots in sparse arrays
+    if (this.hasOwnProperty(i)) {
+      result.push(callback.call(thisArg, this[i], i, this));
+    }
+  }
+  return result;
+};
+
+// ✅ Example
+const nums = [1, 2, 3];
+const doubled = nums.myMap(x => x * 2);
+console.log(doubled); // [2, 4, 6]
+
+2️⃣ Polyfill for Array.prototype.filter()
+
+👉 filter() creates a new array with all elements that pass a test.
+
+✅ Native Example
+const arr = [1, 2, 3, 4];
+const even = arr.filter(num => num % 2 === 0);
+console.log(even); // [2, 4]
+
+🧩 Polyfill Implementation
+Array.prototype.myFilter = function(callback, thisArg) {
+  if (typeof callback !== "function") {
+    throw new TypeError(callback + " is not a function");
+  }
+
+  const result = [];
+  for (let i = 0; i < this.length; i++) {
+    if (this.hasOwnProperty(i)) {
+      if (callback.call(thisArg, this[i], i, this)) {
+        result.push(this[i]);
+      }
+    }
+  }
+  return result;
+};
+
+// ✅ Example
+const arr = [1, 2, 3, 4, 5];
+const even = arr.myFilter(num => num % 2 === 0);
+console.log(even); // [2, 4]
+
+### 8. Explain call apply and bind
+1️⃣ call() — Call immediately, pass arguments individually
+person.greet.call(anotherPerson, "Bengaluru", "India");
+// Output: Hi, I’m Rahul from Bengaluru, India
+
+
+✅ Usage:
+
+Executes the function immediately
+
+Sets the this context to anotherPerson
+
+Arguments are passed comma-separated
+
+2️⃣ apply() — Call immediately, pass arguments as an array
+person.greet.apply(anotherPerson, ["Mysuru", "India"]);
+// Output: Hi, I’m Rahul from Mysuru, India
+
+
+✅ Usage:
+
+Executes the function immediately
+
+Same as call(), but arguments are passed as an array
+
+Handy when you already have data in array form
+
+3️⃣ bind() — Doesn’t call immediately, returns a new function
+const boundGreet = person.greet.bind(anotherPerson, "Hubballi", "India");
+boundGreet(); 
+// Output: Hi, I’m Rahul from Hubballi, India
+
+
+✅ Usage:
+
+Returns a new function with fixed this
+
+Can be called later
+
+Useful in event handlers, callbacks, React class components, etc.
+💡 Practical Example (React-like use case)
+const button = {
+  name: "Save",
+  handleClick: function() {
+    console.log(`${this.name} button clicked`);
+  }
+};
+
+const anotherButton = { name: "Delete" };
+
+setTimeout(button.handleClick, 1000); 
+// ❌ undefined button clicked (lost context)
+
+setTimeout(button.handleClick.bind(anotherButton), 1000);
+// ✅ Delete button clicked
+
+👉 Here, bind() is used to preserve the context for later execution.

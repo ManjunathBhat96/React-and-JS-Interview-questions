@@ -432,3 +432,48 @@ setTimeout(button.handleClick.bind(anotherButton), 1000);
 // ✅ Delete button clicked
 
 👉 Here, bind() is used to preserve the context for later execution.
+
+### 9. What is this?
+The this keyword refers to the object that is currently executing the function.
+
+Its value depends on how a function is called, not where it’s written.
+
+Inside an Object Method
+const user = {
+  name: "Manjunath",
+  greet: function() {
+    console.log(`Hello, ${this.name}`);
+  }
+};
+user.greet(); // Hello, Manjunath
+✅ Here this refers to the object before the dot → user.
+
+Losing this Context (Common Bug)
+const user = {
+  name: "Manjunath",
+  greet: function() {
+    console.log(this.name);
+  }
+};
+
+const greetFn = user.greet;
+greetFn(); // ❌ undefined (or error)
+
+👉 Because greetFn is called without an object, this defaults to global (window) — and window.name is not “Manjunath”.
+
+✅ Fix using .bind():
+const boundGreet = user.greet.bind(user);
+boundGreet(); // ✅ Manjunath
+
+Inside Arrow Functions
+Arrow functions do not have their own this.
+They inherit this from the surrounding (lexical) scope.
+
+const user = {
+  name: "Manjunath",
+  greet: () => {
+    console.log(this.name);
+  }
+};
+
+user.greet(); 
